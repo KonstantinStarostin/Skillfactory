@@ -1,0 +1,98 @@
+// Module_12_7
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+
+// find out possible values of period (K) for string "str"
+// based on string lenght
+bool Vec_K_Periodic(std::vector<int> &vec_K, std::string &str) {
+    vec_K.clear();
+
+    if (str.size() == 0)
+        return false;
+
+    for (int i = 1; i <= str.size() / 2; i++)
+        if (str.size() % i == 0) {
+            vec_K.push_back(i);
+    }
+
+    return true;
+}
+
+// return part of string "str"
+// from "first" to "last" indexes
+std::string str_part(int first, int last, std::string& str) {
+    std::string part = "";
+
+    for (int i = first; i <= last; i++)
+        part += str[i];
+
+    return part;
+}
+
+// find out real values of period (K) for string "str"
+// 
+// based on possible values of period (K) - "possible_K"
+// and fill vector "real_K" with real values of K
+// 
+// get first part of string based of possible values of K
+// and check repetition of this part in the rest lenght of string
+bool Is_K_Periodic(std::vector<int>& possible_K, std::vector<int>& real_K, std::string& str) {
+    real_K.clear();
+
+    // simple cases
+    if (str.size() == 0 || possible_K.empty())
+        return false;
+
+    std::string first_part = "";
+    std::string temp_part = "";
+    bool is_period = true;
+
+    // main cicle, fill "real_K" with values of K, that real to string "str"
+    for (int i = 0; i < possible_K.size(); i++) {
+        is_period = true;
+        first_part = str_part(0, possible_K[i] - 1, str);
+        for (int k = 1; k < (str.size() / first_part.size()); k++) {
+            temp_part = str_part(possible_K[i] * k, possible_K[i] * k + possible_K[i] - 1, str);
+            if (temp_part != first_part) {
+                is_period = false;
+                break;
+            }
+        }
+        if (is_period)
+            real_K.push_back(possible_K[i]);
+    }
+
+    // no real values of K
+    if (real_K.empty())
+        return false;
+    
+    // 1 or more real value of K
+    return true;
+}
+
+int main()
+{
+    std::string str = "";
+    std::cout << "Input string\n";
+    std::cin >> str;
+    std::vector<int> possible_K;
+    std::vector<int> real_K;
+    if (!Vec_K_Periodic(possible_K, str)) {
+        std::cout << "No possible value of period (K)\n";
+        return 0;
+    }
+    if (!Is_K_Periodic(possible_K, real_K, str)) {
+        std::cout << "No possible value of period (K)\n";
+        return 0;
+    }
+    std::string part = "";
+    std::cout << "String \"" << str << "\" have next value of period:\n";
+    for (int i = 0; i < real_K.size(); i++) {
+        part = str_part(0, real_K[i] - 1, str);
+        std::cout << real_K[i] << " - " << part << std::endl;
+    }
+    return 0;
+}
